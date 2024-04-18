@@ -11,8 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+
 
 @Service
 public class StudentJpaService implements StudentRepository {
@@ -43,8 +43,12 @@ public class StudentJpaService implements StudentRepository {
     // Null values adding
     @Override
     public Student addStudent(Student student) {
-        studentJpaRepository.save(student);
-        return student;
+        try {
+            studentJpaRepository.save(student);
+            return student;
+        } catch(Exception e){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
     }
 
     @Override
@@ -59,23 +63,25 @@ public class StudentJpaService implements StudentRepository {
             }
             if (student.getCourses().size() > 0) {
                 newStudent.setCourses(student.getCourses());
+            } else {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
             }
+
             return studentJpaRepository.save(newStudent);
-        } catch (Exception e) {
+        } catch (NoSuchElementException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
     }
 
-    
-        // @Override
-        // public void deleteStudent(int studentId) {
-        //     try {
-        //         studentJpaRepository.deleteById(studentId);
-        //     } catch (Exception e) {
-        //         throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        //     }
-        //     throw new ResponseStatusException(HttpStatus.NO_CONTENT);
-        // }
+    // @Override
+    // public void deleteStudent(int studentId) {
+    // try {
+    // studentJpaRepository.deleteById(studentId);
+    // } catch (Exception e) {
+    // throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+    // }
+    // throw new ResponseStatusException(HttpStatus.NO_CONTENT);
+    // }
 
     @Override
     public void deleteStudent(int studentId) {
